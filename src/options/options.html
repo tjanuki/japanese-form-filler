@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Japanese Form Filler - 設定</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <h1>Japanese Form Filler 設定</h1>
+
+    <section class="settings-section">
+      <h2>基本設定</h2>
+
+      <div class="setting-item">
+        <label for="defaultGender">デフォルトの性別:</label>
+        <select id="defaultGender">
+          <option value="random">ランダム</option>
+          <option value="male">男性</option>
+          <option value="female">女性</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <label for="nameFormat">名前の形式:</label>
+        <select id="nameFormat">
+          <option value="surname-first">姓 名</option>
+          <option value="given-first">名 姓</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>カスタムデータ</h2>
+
+      <div class="setting-item">
+        <label for="customCompanies">カスタム会社名 (1行に1つ):</label>
+        <textarea id="customCompanies" rows="5" placeholder="株式会社サンプル&#10;有限会社テスト"></textarea>
+      </div>
+    </section>
+
+    <div class="save-section">
+      <button id="saveBtn" class="primary-btn">設定を保存</button>
+      <button id="resetBtn" class="secondary-btn">デフォルトに戻す</button>
+      <div id="saveStatus"></div>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

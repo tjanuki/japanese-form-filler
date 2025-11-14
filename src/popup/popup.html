@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Japanese Form Filler</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <h1>日本語フォーム入力</h1>
+
+    <div class="main-actions">
+      <button id="fillFormsBtn" class="primary-btn">
+        フォームを入力
+      </button>
+
+      <button id="clearFormsBtn" class="secondary-btn">
+        クリア
+      </button>
+    </div>
+
+    <div class="status" id="status">
+      クリックしてフォームを入力
+    </div>
+
+    <div class="quick-options">
+      <label>
+        <input type="checkbox" id="skipHiddenFields" checked>
+        非表示フィールドをスキップ
+      </label>
+
+      <label>
+        <input type="checkbox" id="skipReadonlyFields" checked>
+        読み取り専用フィールドをスキップ
+      </label>
+    </div>
+
+    <div class="footer">
+      <a href="#" id="openSettings">設定</a>
+      <span class="version">v1.0.0</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
