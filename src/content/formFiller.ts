@@ -4,16 +4,35 @@
 import { FieldDetector, FieldType } from '../utils/fieldDetector';
 import { DataGenerator, UserData } from '../utils/dataGenerator';
 
+export interface FormFillerSettings {
+  skipHiddenFields: boolean;
+  skipReadonlyFields: boolean;
+  defaultGender: 'random' | 'male' | 'female';
+  nameFormat: 'surname-first' | 'given-first';
+}
+
 export class FormFiller {
   private dataGenerator: DataGenerator;
+  private settings: FormFillerSettings;
 
-  constructor() {
+  constructor(settings?: FormFillerSettings) {
+    this.settings = settings || {
+      skipHiddenFields: true,
+      skipReadonlyFields: true,
+      defaultGender: 'random',
+      nameFormat: 'surname-first'
+    };
     this.dataGenerator = new DataGenerator();
   }
 
   public fillAllForms(): number {
+    // Determine gender based on settings
+    const gender = this.settings.defaultGender === 'random'
+      ? undefined
+      : this.settings.defaultGender;
+
     // Generate a consistent set of data for the entire page
-    const userData = this.dataGenerator.generateUserData();
+    const userData = this.dataGenerator.generateUserData(gender);
 
     let fieldsFilledCount = 0;
 
@@ -33,6 +52,16 @@ export class FormFiller {
     element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
     userData: UserData
   ): boolean {
+    // Check skip settings for hidden and readonly fields
+    if (element instanceof HTMLInputElement) {
+      if (this.settings.skipHiddenFields && element.type === 'hidden') {
+        return false;
+      }
+      if (this.settings.skipReadonlyFields && (element.readOnly || element.disabled)) {
+        return false;
+      }
+    }
+
     const fieldType = FieldDetector.detectFieldType(element);
 
     if (fieldType === FieldType.IGNORE) {
@@ -52,21 +81,29 @@ export class FormFiller {
   }
 
   private getValueForFieldType(fieldType: FieldType, userData: UserData): string | null {
+    const surnameFirst = this.settings.nameFormat === 'surname-first';
+
     switch (fieldType) {
       case FieldType.FULL_NAME_KANJI:
-        return `${userData.name.kanjiSurname} ${userData.name.kanjiGivenName}`;
+        return surnameFirst
+          ? `${userData.name.kanjiSurname} ${userData.name.kanjiGivenName}`
+          : `${userData.name.kanjiGivenName} ${userData.name.kanjiSurname}`;
       case FieldType.SURNAME_KANJI:
         return userData.name.kanjiSurname;
       case FieldType.GIVEN_NAME_KANJI:
         return userData.name.kanjiGivenName;
       case FieldType.FULL_NAME_HIRAGANA:
-        return `${userData.name.hiraganaSurname} ${userData.name.hiraganaGivenName}`;
+        return surnameFirst
+          ? `${userData.name.hiraganaSurname} ${userData.name.hiraganaGivenName}`
+          : `${userData.name.hiraganaGivenName} ${userData.name.hiraganaSurname}`;
       case FieldType.SURNAME_HIRAGANA:
         return userData.name.hiraganaSurname;
       case FieldType.GIVEN_NAME_HIRAGANA:
         return userData.name.hiraganaGivenName;
       case FieldType.FULL_NAME_KATAKANA:
-        return `${userData.name.katakanaSurname} ${userData.name.katakanaGivenName}`;
+        return surnameFirst
+          ? `${userData.name.katakanaSurname} ${userData.name.katakanaGivenName}`
+          : `${userData.name.katakanaGivenName} ${userData.name.katakanaSurname}`;
       case FieldType.EMAIL:
         return userData.email;
       case FieldType.PHONE:

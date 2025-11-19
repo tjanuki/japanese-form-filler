@@ -3,14 +3,35 @@
 
 import { FormFiller } from './formFiller';
 
+// Settings interface
+interface FormFillerSettings {
+  skipHiddenFields: boolean;
+  skipReadonlyFields: boolean;
+  defaultGender: 'random' | 'male' | 'female';
+  nameFormat: 'surname-first' | 'given-first';
+}
+
 // Listen for messages from popup or background script
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'fillForms') {
-    const filler = new FormFiller();
-    const fieldsCount = filler.fillAllForms();
+    // Load settings before filling forms
+    chrome.storage.sync.get(
+      ['skipHiddenFields', 'skipReadonlyFields', 'defaultGender', 'nameFormat'],
+      (items) => {
+        const settings: FormFillerSettings = {
+          skipHiddenFields: items.skipHiddenFields !== false,
+          skipReadonlyFields: items.skipReadonlyFields !== false,
+          defaultGender: (items.defaultGender as 'random' | 'male' | 'female') || 'random',
+          nameFormat: (items.nameFormat as 'surname-first' | 'given-first') || 'surname-first'
+        };
 
-    showNotification(`${fieldsCount} 件のフィールドを入力しました`);
-    sendResponse({ success: true, fieldsCount });
+        const filler = new FormFiller(settings);
+        const fieldsCount = filler.fillAllForms();
+
+        showNotification(`${fieldsCount} 件のフィールドを入力しました`);
+        sendResponse({ success: true, fieldsCount });
+      }
+    );
   } else if (request.action === 'clearForms') {
     clearAllForms();
     showNotification('フォームをクリアしました');

@@ -46,14 +46,10 @@ export class FieldDetector {
   };
 
   static detectFieldType(element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement): FieldType {
-    // Check if should ignore
-    if (element instanceof HTMLInputElement) {
-      if (element.type === 'hidden' ||
-          element.disabled ||
-          element.readOnly ||
-          this.matchesPattern(element, this.patterns[FieldType.IGNORE]!)) {
-        return FieldType.IGNORE;
-      }
+    // Check if should ignore based on field purpose (password, captcha, etc.)
+    // Note: hidden/disabled/readonly checks are handled by FormFiller settings
+    if (this.matchesPattern(element, this.patterns[FieldType.IGNORE]!)) {
+      return FieldType.IGNORE;
     }
 
     // Get all identifiable strings from element
