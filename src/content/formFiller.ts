@@ -54,6 +54,10 @@ export class FormFiller {
   ): boolean {
     // Check skip settings for hidden and readonly fields
     if (element instanceof HTMLInputElement) {
+      // Skip file inputs - browsers don't allow setting their value programmatically
+      if (element.type === 'file') {
+        return false;
+      }
       if (this.settings.skipHiddenFields && element.type === 'hidden') {
         return false;
       }

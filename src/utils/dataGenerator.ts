@@ -42,6 +42,7 @@ export class DataGenerator {
     const month = Math.floor(Math.random() * 12) + 1;
     const day = Math.floor(Math.random() * 28) + 1;
 
-    return `${birthYear}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+    // Use yyyy-MM-dd format for HTML date inputs
+    return `${birthYear}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   }
 }
