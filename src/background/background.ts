@@ -53,3 +53,10 @@ chrome.commands.onCommand.addListener((command) => {
     });
   }
 });
+
+// Handle extension icon click - fill forms immediately
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id) {
+    chrome.tabs.sendMessage(tab.id, { action: 'fillForms' });
+  }
+});
