@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send message to content script to fill forms
     chrome.tabs.sendMessage(tab.id!, { action: 'fillForms' }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error:', chrome.runtime.lastError.message);
+        statusDiv.textContent = `エラー: ${chrome.runtime.lastError.message}`;
+        return;
+      }
       if (response && response.success) {
         statusDiv.textContent = `${response.fieldsCount} 件のフィールドを入力しました`;
       } else {
