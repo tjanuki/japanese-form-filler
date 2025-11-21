@@ -31,35 +31,48 @@ export class FieldDetector {
     [FieldType.PHONE]: /phone|tel|電話|でんわ|denwa/i,
     [FieldType.MOBILE_PHONE]: /mobile|携帯|けいたい|keitai/i,
     [FieldType.POSTAL_CODE]: /postal|zip|郵便|〒|ゆうびん|yuubin/i,
-    [FieldType.FULL_NAME_KANJI]: /fullname|full_name|氏名|shimei|name.*kanji/i,
+    [FieldType.FULL_NAME_KANJI]: /fullname|full_name|氏名|shimei|name.*kanji|担当者名/i,
     [FieldType.SURNAME_KANJI]: /surname|last.*name|姓|苗字|みょうじ|myouji|sei(?!.*kana)/i,
-    [FieldType.GIVEN_NAME_KANJI]: /givenname|given.*name|first.*name|名(?!前)|なまえ|mei(?!.*kana)/i,
+    [FieldType.GIVEN_NAME_KANJI]: /givenname|given.*name|first.*name|(?<!会社|案件|担当者)名(?!前)|なまえ|mei(?!.*kana)/i,
     [FieldType.FULL_NAME_HIRAGANA]: /name.*hiragana|ふりがな.*氏名|furigana.*name/i,
     [FieldType.SURNAME_HIRAGANA]: /surname.*hiragana|せい.*ふりがな|姓.*ひらがな|sei.*kana/i,
     [FieldType.GIVEN_NAME_HIRAGANA]: /givenname.*hiragana|めい.*ふりがな|名.*ひらがな|mei.*kana/i,
     [FieldType.FULL_NAME_KATAKANA]: /name.*katakana|カタカナ.*氏名|katakana.*name/i,
-    [FieldType.PREFECTURE]: /prefecture|都道府県|とどうふけん|todofuken/i,
+    [FieldType.PREFECTURE]: /prefecture|都道府県|とどうふけん|todofuken|勤務地/i,
     [FieldType.CITY]: /city|市区町村|しくちょうそん|shikuchouson/i,
     [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho/i,
-    [FieldType.COMPANY_NAME]: /company|会社|勤務先|きんむさき|kaisha/i,
+    [FieldType.COMPANY_NAME]: /company|会社名|勤務先|きんむさき|kaisha/i,
     [FieldType.IGNORE]: /password|passwd|pwd|captcha|hidden|secret|otp|verification/i
   };
 
-  static detectFieldType(element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement): FieldType {
-    // Check if should ignore based on field purpose (password, captcha, etc.)
-    // Note: hidden/disabled/readonly checks are handled by FormFiller settings
-    if (this.matchesPattern(element, this.patterns[FieldType.IGNORE]!)) {
-      return FieldType.IGNORE;
-    }
+  // Priority order for pattern matching - higher priority patterns should match first
+  private static patternOrder: FieldType[] = [
+    FieldType.IGNORE,
+    FieldType.EMAIL,
+    FieldType.PHONE,
+    FieldType.MOBILE_PHONE,
+    FieldType.POSTAL_CODE,
+    FieldType.COMPANY_NAME,  // Check company before generic name patterns
+    FieldType.FULL_NAME_KANJI,
+    FieldType.SURNAME_KANJI,
+    FieldType.GIVEN_NAME_KANJI,
+    FieldType.FULL_NAME_HIRAGANA,
+    FieldType.SURNAME_HIRAGANA,
+    FieldType.GIVEN_NAME_HIRAGANA,
+    FieldType.FULL_NAME_KATAKANA,
+    FieldType.PREFECTURE,
+    FieldType.CITY,
+    FieldType.ADDRESS
+  ];
 
+  static detectFieldType(element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement): FieldType {
     // Get all identifiable strings from element
     const identifiers = this.getElementIdentifiers(element);
     const combinedString = identifiers.join(' ');
 
     // Match against patterns in priority order
-    for (const [fieldTypeStr, pattern] of Object.entries(this.patterns)) {
-      const fieldType = Number(fieldTypeStr) as FieldType;
-      if (fieldType === FieldType.IGNORE) continue;
+    for (const fieldType of this.patternOrder) {
+      const pattern = this.patterns[fieldType];
       if (pattern && pattern.test(combinedString)) {
         return fieldType;
       }
@@ -115,9 +128,5 @@ export class FieldDetector {
     }
 
     return null;
-  }
-
-  private static matchesPattern(element: HTMLElement, pattern: RegExp): boolean {
-    return this.getElementIdentifiers(element).some(id => pattern.test(id));
   }
 }
