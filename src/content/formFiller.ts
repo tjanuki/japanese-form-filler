@@ -397,6 +397,12 @@ export class FormFiller {
       return false;
     }
 
+    // Skip if dropdown is already open (prevents infinite loop)
+    const isOpen = element.classList.contains('p-select-open');
+    if (isOpen) {
+      return false;
+    }
+
     // Detect field type from the element's context
     const fieldType = this.detectPrimeVueFieldType(element);
     if (fieldType === null) {
@@ -506,7 +512,11 @@ export class FormFiller {
     }
 
     if (selectedOption) {
-      selectedOption.click();
+      // Dispatch proper MouseEvent sequence for Vue compatibility
+      selectedOption.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }));
+      selectedOption.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+      selectedOption.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+      selectedOption.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     }
   }
 
