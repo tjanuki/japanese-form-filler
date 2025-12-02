@@ -75,6 +75,14 @@ export class FormFiller {
       }
     });
 
+    // Find and fill PrimeVue InputNumber components
+    const primeInputNumbers = document.querySelectorAll('.p-inputnumber');
+    primeInputNumbers.forEach((element) => {
+      if (this.fillPrimeVueInputNumber(element as HTMLElement, userData)) {
+        fieldsFilledCount++;
+      }
+    });
+
     return fieldsFilledCount;
   }
 
@@ -380,6 +388,9 @@ export class FormFiller {
   }
 
   private triggerEvents(element: HTMLElement): void {
+    const isPrimeInputNumber = element.classList.contains('p-inputnumber-input') ||
+                               element.closest('.p-inputnumber') !== null;
+
     // Trigger input event (for React, Vue, Angular)
     element.dispatchEvent(new Event('input', { bubbles: true }));
 
@@ -388,6 +399,16 @@ export class FormFiller {
 
     // Trigger blur event
     element.dispatchEvent(new Event('blur', { bubbles: true }));
+
+    // For Vue components, also try InputEvent and custom events
+    if (isPrimeInputNumber) {
+      // Try InputEvent (more specific for Vue)
+      const inputEvent = new InputEvent('input', { bubbles: true, cancelable: true });
+      element.dispatchEvent(inputEvent);
+
+      // Also try focus event before blur
+      element.dispatchEvent(new Event('focus', { bubbles: true }));
+    }
   }
 
   private fillPrimeVueSelect(element: HTMLElement, userData: UserData): boolean {
@@ -559,5 +580,135 @@ export class FormFiller {
       // Click outside or press escape to close
       document.body.click();
     }, 100);
+  }
+
+  private fillPrimeVueInputNumber(element: HTMLElement, _userData: UserData): boolean {
+    // Find the actual input element inside the InputNumber wrapper
+    const input = element.querySelector('.p-inputnumber-input') as HTMLInputElement;
+
+    if (!input) {
+      return false;
+    }
+
+    // Skip if already has a value
+    if (input.value && input.value.trim() !== '') {
+      return false;
+    }
+
+    // Skip if disabled or readonly
+    if (input.disabled || input.readOnly) {
+      return false;
+    }
+
+    // Detect the field type based on context
+    const fieldType = this.detectPrimeVueInputNumberFieldType(element);
+
+    // Generate appropriate numeric value based on field type
+    const value = this.generateNumericValueForFieldType(fieldType);
+
+    // Set the value
+    return this.setPrimeVueInputNumberValue(input, value);
+  }
+
+  private generateNumericValueForFieldType(fieldType: string): string {
+    switch (fieldType) {
+      case 'recruitment-count':
+        // Number of recruits: typically 1-20
+        return (Math.floor(Math.random() * 20) + 1).toString();
+
+      case 'age':
+        // Age: typically 20-65
+        return (Math.floor(Math.random() * 46) + 20).toString();
+
+      case 'daily-wage':
+        // Daily wage in yen: typically 10,000-30,000
+        return (Math.floor(Math.random() * 21) * 1000 + 10000).toString();
+
+      case 'salary':
+        // Monthly/yearly salary in yen: typically 200,000-500,000 for monthly
+        return (Math.floor(Math.random() * 31) * 10000 + 200000).toString();
+
+      case 'duration':
+        // Duration in days/months: typically 1-12
+        return (Math.floor(Math.random() * 12) + 1).toString();
+
+      case 'generic-number':
+      default:
+        // Default numeric value: 1-100
+        return (Math.floor(Math.random() * 100) + 1).toString();
+    }
+  }
+
+  private detectPrimeVueInputNumberFieldType(element: HTMLElement): string {
+    const identifiers = this.getElementIdentifiers(element);
+
+    // Also get identifiers from the input element itself
+    const input = element.querySelector('.p-inputnumber-input');
+    if (input) {
+      identifiers.push(...this.getElementIdentifiers(input as HTMLElement));
+    }
+
+    const combinedString = identifiers.join(' ').toLowerCase();
+
+    // Check for common numeric fields in Japanese forms
+    // Order matters! Check more specific patterns first
+
+    // Check for wage/salary fields first (more specific)
+    if (/日当|日給|時給|hourly|daily/.test(combinedString)) {
+      return 'daily-wage';
+    }
+
+    if (/金額|price|料金|給料|月給|年収|salary|amount/.test(combinedString)) {
+      return 'salary';
+    }
+
+    // Then check for recruitment count (must come after wage checks)
+    if (/募集人数/.test(combinedString)) {
+      return 'recruitment-count';
+    }
+
+    if (/人数|number|count/.test(combinedString)) {
+      return 'recruitment-count';
+    }
+
+    if (/年齢|age/.test(combinedString)) {
+      return 'age';
+    }
+
+    if (/期間|日数|days|months|years/.test(combinedString)) {
+      return 'duration';
+    }
+
+    // Default for other number fields
+    return 'generic-number';
+  }
+
+  private setPrimeVueInputNumberValue(input: HTMLInputElement, value: string): boolean {
+    // Set the value
+    input.value = value;
+
+    // Trigger events for Vue to pick up the change
+    // Focus the input first
+    input.focus();
+
+    // Create and dispatch input event
+    const inputEvent = new InputEvent('input', {
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    });
+    input.dispatchEvent(inputEvent);
+
+    // Dispatch change event
+    const changeEvent = new Event('change', {
+      bubbles: true,
+      cancelable: true
+    });
+    input.dispatchEvent(changeEvent);
+
+    // Dispatch blur event
+    input.blur();
+
+    return true;
   }
 }
