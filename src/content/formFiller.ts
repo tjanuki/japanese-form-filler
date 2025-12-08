@@ -85,8 +85,7 @@ export class FormFiller {
 
     // Find and fill PrimeVue DatePicker components
     const primeDatePickers = document.querySelectorAll('.p-datepicker');
-    console.log(`[FormFiller] Found ${primeDatePickers.length} PrimeVue DatePicker components`);
-    primeDatePickers.forEach((element) => {
+        primeDatePickers.forEach((element) => {
       if (this.fillPrimeVueDatePicker(element as HTMLElement, userData)) {
         fieldsFilledCount++;
       }
@@ -754,18 +753,12 @@ export class FormFiller {
   }
 
   private fillPrimeVueDatePicker(element: HTMLElement, userData: UserData): boolean {
-    console.log('[FormFiller] Analyzing PrimeVue DatePicker:', {
-      id: element.id,
-      classes: element.className,
-      innerHTML: element.innerHTML.substring(0, 200)
-    });
-
+    
     // Check if this is a date/range selector and switch to single date mode if needed
     const switchedMode = this.ensureSingleDateMode(element);
     if (switchedMode) {
       // Wait for the UI to update after switching mode
-      console.log('[FormFiller] Waiting for UI to update after mode switch...');
-      setTimeout(() => {
+            setTimeout(() => {
         this.fillPrimeVueDatePickerAfterModeSwitch(element, userData);
       }, 300);
       return true; // Return true as we initiated the fill
@@ -778,70 +771,46 @@ export class FormFiller {
     // Find the input element
     const input = element.querySelector('.p-datepicker-input') as HTMLInputElement;
     if (!input) {
-      console.log('[FormFiller] No input found in DatePicker');
-      return false;
+            return false;
     }
 
-    console.log('[FormFiller] DatePicker input:', {
-      id: input.id,
-      value: input.value,
-      readonly: input.readOnly,
-      disabled: input.disabled,
-      type: input.type,
-      role: input.getAttribute('role'),
-      ariaExpanded: input.getAttribute('aria-expanded')
-    });
-
+    
     // Skip if already has a value
     if (input.value && input.value.trim() !== '') {
-      console.log('[FormFiller] DatePicker already has value:', input.value);
-      return false;
+            return false;
     }
 
     // Skip if disabled
     if (input.disabled) {
-      console.log('[FormFiller] DatePicker is disabled');
-      return false;
+            return false;
     }
 
     // Detect field type based on context
     const fieldType = this.detectDatePickerFieldType(element);
-    console.log('[FormFiller] Detected DatePicker field type:', fieldType);
-
+    
     // Get the date value
     const dateValue = this.getDateValueForFieldType(fieldType, userData);
-    console.log('[FormFiller] Generated date value:', dateValue);
-
+    
     // Find the button to open the picker
     const button = element.querySelector('.p-datepicker-dropdown') as HTMLButtonElement;
-    console.log('[FormFiller] DatePicker button:', {
-      found: !!button,
-      ariaExpanded: button?.getAttribute('aria-expanded')
-    });
-
+    
     // Try different approaches to set the date
-    console.log('[FormFiller] Attempting to fill DatePicker...');
-
+    
     // Approach 1: Try setting the input value directly
-    console.log('[FormFiller] Approach 1: Setting input value directly');
-    const success1 = this.tryDirectValueSet(input, dateValue);
+        const success1 = this.tryDirectValueSet(input, dateValue);
     if (success1) {
-      console.log('[FormFiller] ✓ Direct value set successful');
-      return true;
+            return true;
     }
 
     // Approach 2: Try clicking the button and selecting from calendar
     if (button) {
-      console.log('[FormFiller] Approach 2: Opening calendar picker');
-      const success2 = this.tryCalendarSelection(element, button, dateValue);
+            const success2 = this.tryCalendarSelection(element, button, dateValue);
       if (success2) {
-        console.log('[FormFiller] ✓ Calendar selection successful');
-        return true;
+                return true;
       }
     }
 
-    console.log('[FormFiller] ✗ Failed to fill DatePicker');
-    return false;
+        return false;
   }
 
   private ensureSingleDateMode(element: HTMLElement): boolean {
@@ -849,14 +818,12 @@ export class FormFiller {
       // Find the parent container that might have radio buttons
       const parentContainer = element.closest('.mb-4, .flex-1, .form-group, .field');
       if (!parentContainer) {
-        console.log('[FormFiller] No parent container found for date/range selector');
-        return false;
+                return false;
       }
 
       // Look for radio buttons with value="date" or label "日付"
       const radioButtons = parentContainer.querySelectorAll('input[type="radio"]');
-      console.log('[FormFiller] Found', radioButtons.length, 'radio buttons in container');
-
+      
       for (const radio of Array.from(radioButtons)) {
         const radioInput = radio as HTMLInputElement;
         const radioValue = radioInput.value;
@@ -871,18 +838,11 @@ export class FormFiller {
           }
         }
 
-        console.log('[FormFiller] Radio button:', {
-          id: radioId,
-          value: radioValue,
-          label: radioLabel,
-          checked: radioInput.checked
-        });
-
+        
         // Check if this is the "date" (日付) option
         if (radioValue === 'date' || radioLabel === '日付') {
           if (!radioInput.checked) {
-            console.log('[FormFiller] Switching to single date mode by clicking "日付" radio button');
-
+            
             // Click the radio button input directly
             radioInput.click();
 
@@ -895,17 +855,14 @@ export class FormFiller {
               (radioWrapper as HTMLElement).click();
             }
 
-            console.log('[FormFiller] Clicked "日付" radio button, mode switched');
-            return true; // Indicate that we switched modes
+                        return true; // Indicate that we switched modes
           } else {
-            console.log('[FormFiller] Already in single date mode');
-            return false; // Already in correct mode, no switch needed
+                        return false; // Already in correct mode, no switch needed
           }
         }
       }
 
-      console.log('[FormFiller] No date/range selector found');
-      return false;
+            return false;
     } catch (error) {
       console.error('[FormFiller] Error ensuring single date mode:', error);
       return false;
@@ -920,8 +877,7 @@ export class FormFiller {
     }
 
     const combinedString = identifiers.join(' ').toLowerCase();
-    console.log('[FormFiller] DatePicker identifiers:', combinedString);
-
+    
     // Check for specific date field types (order matters - check most specific first)
 
     // Birth date (past date)
@@ -985,36 +941,31 @@ export class FormFiller {
         // 勤務日: +5 weeks (furthest in the future)
         targetDate = new Date(today);
         targetDate.setDate(today.getDate() + (5 * 7));
-        console.log('[FormFiller] Work date (+5 weeks):', this.formatDate(targetDate));
-        break;
+                break;
 
       case 'order-deadline':
         // 発注締切: +4 weeks
         targetDate = new Date(today);
         targetDate.setDate(today.getDate() + (4 * 7));
-        console.log('[FormFiller] Order deadline (+4 weeks):', this.formatDate(targetDate));
-        break;
+                break;
 
       case 'application-deadline':
         // 応募締切: +4 weeks (same as order deadline)
         targetDate = new Date(today);
         targetDate.setDate(today.getDate() + (4 * 7));
-        console.log('[FormFiller] Application deadline (+4 weeks):', this.formatDate(targetDate));
-        break;
+                break;
 
       case 'recruitment-deadline':
         // 募集締切: +3 weeks
         targetDate = new Date(today);
         targetDate.setDate(today.getDate() + (3 * 7));
-        console.log('[FormFiller] Recruitment deadline (+3 weeks):', this.formatDate(targetDate));
-        break;
+                break;
 
       case 'cancellation-deadline':
         // キャンセル期限: +2 weeks
         targetDate = new Date(today);
         targetDate.setDate(today.getDate() + (2 * 7));
-        console.log('[FormFiller] Cancellation deadline (+2 weeks):', this.formatDate(targetDate));
-        break;
+                break;
 
       case 'generic-deadline':
         // Generic deadline: +1 week
@@ -1038,8 +989,7 @@ export class FormFiller {
       default:
         // Use today's date
         targetDate = today;
-        console.log('[FormFiller] Generic date (today):', this.formatDate(today));
-        break;
+                break;
     }
 
     // Format as YYYY-MM-DD
@@ -1057,22 +1007,11 @@ export class FormFiller {
     try {
       const wasReadonly = input.readOnly;
       const inputMode = input.getAttribute('inputmode');
-      console.log('[FormFiller] Input readonly state:', wasReadonly, 'inputmode:', inputMode);
-
+      
       // If inputmode is "none", this input is designed to only accept calendar input
       // But we'll still try for readonly inputs since those worked
       if (inputMode === 'none' && !wasReadonly) {
-        console.log('[FormFiller] Input has inputmode="none" and not readonly, skipping direct value set');
-        return false;
-      }
-
-      // Try to access Vue component instance
-      console.log('[FormFiller] Attempting to access Vue component...');
-      const vueKey = Object.keys(input).find(key => key.startsWith('__v'));
-      if (vueKey) {
-        console.log('[FormFiller] Found Vue key:', vueKey);
-        const vueInstance = (input as any)[vueKey];
-        console.log('[FormFiller] Vue instance:', vueInstance);
+                return false;
       }
 
       // Try different date formats
@@ -1082,12 +1021,10 @@ export class FormFiller {
         this.formatDateJapanese(dateValue), // YYYY年MM月DD日
       ];
 
-      console.log('[FormFiller] Trying date formats:', formats);
-
+      
       for (let i = 0; i < formats.length; i++) {
         const format = formats[i];
-        console.log(`[FormFiller] === Attempt ${i + 1}: ${format} ===`);
-
+        
         // Temporarily remove readonly to set value
         if (wasReadonly) {
           input.readOnly = false;
@@ -1098,19 +1035,16 @@ export class FormFiller {
 
         // Focus first
         input.focus();
-        console.log('[FormFiller] Focused input');
-
+        
         // Set the value using multiple approaches
         // 1. Direct value set
         input.value = format;
-        console.log('[FormFiller] Set value directly:', input.value);
-
+        
         // 2. Set via property descriptor if available
         const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
         if (valueSetter) {
           valueSetter.call(input, format);
-          console.log('[FormFiller] Set value via property descriptor:', input.value);
-        }
+                  }
 
         // 3. Trigger Vue-specific events
         // Create a custom event that Vue might be listening for
@@ -1123,43 +1057,35 @@ export class FormFiller {
           data: format
         }));
 
-        console.log('[FormFiller] After input events, value:', input.value);
-
+        
         // Trigger change event
         input.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        console.log('[FormFiller] After change event, value:', input.value);
-
+        
         // Trigger update event (Vue-specific)
         input.dispatchEvent(new Event('update:modelValue', { bubbles: true }));
 
         // DON'T blur yet - check if value is still there before blur
-        console.log('[FormFiller] Before blur, value:', input.value);
-
+        
         // Only blur if readonly (which worked), otherwise skip blur
         if (wasReadonly) {
           input.blur();
           input.dispatchEvent(new Event('blur', { bubbles: true }));
-          console.log('[FormFiller] After blur, final value:', input.value);
-        } else {
-          console.log('[FormFiller] Skipping blur for non-readonly input');
-        }
+                  } else {
+                  }
 
         // Restore readonly state
         if (wasReadonly) {
           input.readOnly = true;
         }
 
-        console.log('[FormFiller] Final value check:', input.value, 'readonly restored:', input.readOnly);
-
+        
         // If value stuck, we're successful
         if (input.value !== '') {
-          console.log('[FormFiller] ✓ Format', format, 'succeeded!');
-          return true;
+                    return true;
         }
       }
 
-      console.log('[FormFiller] ✗ All formats failed, value is still empty');
-      return false;
+            return false;
     } catch (error) {
       console.error('[FormFiller] Error in tryDirectValueSet:', error);
       return false;
@@ -1173,30 +1099,25 @@ export class FormFiller {
 
   private tryCalendarSelection(element: HTMLElement, button: HTMLButtonElement, dateValue: string): boolean {
     try {
-      console.log('[FormFiller] Clicking DatePicker button to open calendar');
-
+      
       // Get the panel ID for this specific datepicker
       const panelId = element.id + '_panel';
-      console.log('[FormFiller] Looking for panel ID:', panelId);
-
+      
       // Set up a MutationObserver to detect when the panel is added to the DOM
       const observer = new MutationObserver((mutations) => {
-        console.log('[FormFiller] DOM mutations detected:', mutations.length);
-
+        
         for (const mutation of mutations) {
           if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
             mutation.addedNodes.forEach(node => {
               if (node instanceof HTMLElement) {
                 // Check if this is the panel or contains the panel
                 if (node.classList.contains('p-datepicker-panel') || node.querySelector('.p-datepicker-panel')) {
-                  console.log('[FormFiller] Panel detected via MutationObserver!');
-                  const panel = node.classList.contains('p-datepicker-panel')
+                                    const panel = node.classList.contains('p-datepicker-panel')
                     ? node
                     : node.querySelector('.p-datepicker-panel') as HTMLElement;
 
                   if (panel) {
-                    console.log('[FormFiller] Found panel:', panel.id, panel.className);
-                    // Try to select a date immediately
+                                        // Try to select a date immediately
                     setTimeout(() => this.selectDateFromPanel(panel, dateValue), 50);
                   }
                 }
@@ -1215,59 +1136,44 @@ export class FormFiller {
       // Stop observing after 1 second
       setTimeout(() => {
         observer.disconnect();
-        console.log('[FormFiller] MutationObserver disconnected');
-      }, 1000);
+              }, 1000);
 
       // Click the button to open the calendar
       button.click();
 
       // Also try the traditional timeout-based approach as a backup
       setTimeout(() => {
-        console.log('[FormFiller] Timeout-based lookup starting...');
-
+        
         // Try to find the specific panel for this datepicker
         let panel: HTMLElement | null = document.getElementById(panelId);
 
         // If not found by ID, try to find by aria-controls
         if (!panel) {
           const ariaControls = button.getAttribute('aria-controls');
-          console.log('[FormFiller] Panel not found by ID, trying aria-controls:', ariaControls);
-          if (ariaControls) {
+                    if (ariaControls) {
             panel = document.getElementById(ariaControls);
           }
         }
 
         // If still not found, find ANY panel that exists
         if (!panel) {
-          console.log('[FormFiller] Panel not found by aria-controls, looking for any panel');
-          const allPanels = document.querySelectorAll('.p-datepicker-panel, [role="dialog"][aria-modal="true"]');
-          console.log('[FormFiller] Found', allPanels.length, 'total panels');
-
+                    const allPanels = document.querySelectorAll('.p-datepicker-panel, [role="dialog"][aria-modal="true"]');
+          
           for (let i = 0; i < allPanels.length; i++) {
             const p = allPanels[i] as HTMLElement;
             const computedStyle = window.getComputedStyle(p);
             const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
 
-            console.log('[FormFiller] Panel', i, ':', {
-              id: p.id,
-              offsetParent: p.offsetParent !== null,
-              display: computedStyle.display,
-              visibility: computedStyle.visibility,
-              isVisible: isVisible,
-              classes: p.className
-            });
-
+            
             if (isVisible) {
               panel = p;
-              console.log('[FormFiller] Using visible panel:', p.id);
-              break;
+                            break;
             }
           }
         }
 
         if (!panel) {
-          console.log('[FormFiller] Calendar panel not found after all attempts');
-          return;
+                    return;
         }
 
         this.selectDateFromPanel(panel, dateValue);
@@ -1281,35 +1187,25 @@ export class FormFiller {
   }
 
   private selectDateFromPanel(panel: HTMLElement, dateValue: string): void {
-    console.log('[FormFiller] selectDateFromPanel called for:', {
-      id: panel.id,
-      classes: panel.className,
-      visible: panel.offsetParent !== null,
-      targetDate: dateValue
-    });
-
+    
     // Parse the target date (YYYY-MM-DD)
     const [targetYear, targetMonth, targetDay] = dateValue.split('-').map(Number);
-    console.log('[FormFiller] Target date:', { year: targetYear, month: targetMonth, day: targetDay });
-
+    
     // Get the current month/year shown in the calendar
     const monthYearTitle = panel.querySelector('.p-datepicker-title');
     if (monthYearTitle) {
-      console.log('[FormFiller] Current calendar title:', monthYearTitle.textContent);
-    }
+          }
 
     // Navigate to the correct month/year if needed
     const navigated = this.navigateToMonthYear(panel, targetYear, targetMonth);
     if (!navigated) {
-      console.log('[FormFiller] Failed to navigate to target month/year, will try selecting from current view');
-    }
+          }
 
     // Wait a bit for navigation to complete
     setTimeout(() => {
       // Look for the specific date in the calendar
       const dates = panel.querySelectorAll('.p-datepicker-day:not(.p-datepicker-day-disabled)');
-      console.log('[FormFiller] Found', dates.length, 'selectable dates in panel');
-
+      
       let targetDateElement: HTMLElement | null = null;
 
       // Find the date element that matches our target day
@@ -1317,20 +1213,17 @@ export class FormFiller {
         const dayText = dateEl.textContent?.trim();
         if (dayText && parseInt(dayText) === targetDay) {
           targetDateElement = dateEl as HTMLElement;
-          console.log('[FormFiller] Found matching date element:', dayText);
-          break;
+                    break;
         }
       }
 
       // Fallback: if we can't find the exact date, use middle date
       if (!targetDateElement && dates.length > 0) {
         targetDateElement = dates[Math.floor(dates.length / 2)] as HTMLElement;
-        console.log('[FormFiller] Could not find exact date, using fallback:', targetDateElement.textContent?.trim());
-      }
+              }
 
       if (targetDateElement) {
-        console.log('[FormFiller] Clicking date:', targetDateElement.textContent?.trim(), 'HTML:', targetDateElement.outerHTML.substring(0, 200));
-
+        
         // Try multiple click approaches
         // 1. MouseEvent sequence
         targetDateElement.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }));
@@ -1346,16 +1239,13 @@ export class FormFiller {
           targetDateElement.click();
         }
 
-        console.log('[FormFiller] Date clicked with multiple approaches');
-
+        
         // After a short delay, check if the calendar closed (indicating success)
         setTimeout(() => {
           const stillVisible = panel.offsetParent !== null;
-          console.log('[FormFiller] Calendar still visible after click:', stillVisible);
-
+          
           if (stillVisible) {
-            console.log('[FormFiller] Calendar still open, trying to close it');
-            // Try pressing Escape
+                        // Try pressing Escape
             panel.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             // Or click outside
             document.body.click();
@@ -1372,8 +1262,7 @@ export class FormFiller {
       const yearSelect = panel.querySelector('.p-datepicker-year') as HTMLSelectElement;
 
       if (monthSelect && yearSelect) {
-        console.log('[FormFiller] Found month/year selects, setting values directly');
-
+        
         // Set year (months are 1-indexed in our target but 0-indexed in select)
         yearSelect.value = targetYear.toString();
         yearSelect.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1382,23 +1271,19 @@ export class FormFiller {
         monthSelect.value = (targetMonth - 1).toString();
         monthSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
-        console.log('[FormFiller] Set calendar to:', targetYear, targetMonth);
-        return true;
+                return true;
       }
 
       // Alternative: use prev/next buttons to navigate
-      console.log('[FormFiller] No month/year selects found, trying navigation buttons');
-
+      
       // Get the title to parse current month/year
       const titleEl = panel.querySelector('.p-datepicker-title');
       if (!titleEl) {
-        console.log('[FormFiller] No title element found');
-        return false;
+                return false;
       }
 
       const titleText = titleEl.textContent || '';
-      console.log('[FormFiller] Current title:', titleText);
-
+      
       // Try to parse year and month from title
       // Common formats: "December 2025", "2025年12月", etc.
       const yearMatch = titleText.match(/\d{4}/);
@@ -1417,16 +1302,12 @@ export class FormFiller {
         }
       }
 
-      console.log('[FormFiller] Parsed current:', { year: currentYear, month: currentMonth });
-      console.log('[FormFiller] Target:', { year: targetYear, month: targetMonth });
-
+            
       // Calculate how many months to navigate
       const monthDiff = (targetYear - currentYear) * 12 + (targetMonth - currentMonth);
-      console.log('[FormFiller] Months to navigate:', monthDiff);
-
+      
       if (monthDiff === 0) {
-        console.log('[FormFiller] Already on target month');
-        return true;
+                return true;
       }
 
       // Find next/prev buttons
@@ -1434,16 +1315,14 @@ export class FormFiller {
       const nextButton = panel.querySelector('.p-datepicker-next, [data-pc-section="nextbutton"]');
 
       if (!prevButton || !nextButton) {
-        console.log('[FormFiller] Navigation buttons not found');
-        return false;
+                return false;
       }
 
       // Navigate the required number of months
       const button = monthDiff > 0 ? nextButton : prevButton;
       const clicks = Math.abs(monthDiff);
 
-      console.log('[FormFiller] Clicking', clicks, 'times on', monthDiff > 0 ? 'next' : 'prev', 'button');
-
+      
       for (let i = 0; i < Math.min(clicks, 12); i++) { // Limit to 12 clicks max
         (button as HTMLElement).click();
         // Small delay between clicks
