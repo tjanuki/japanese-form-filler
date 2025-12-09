@@ -40,8 +40,8 @@ export class FieldDetector {
     [FieldType.FULL_NAME_KATAKANA]: /name.*katakana|カタカナ.*氏名|katakana.*name/i,
     [FieldType.PREFECTURE]: /prefecture|都道府県|とどうふけん|todofuken|勤務地/i,
     [FieldType.CITY]: /city|市区町村|しくちょうそん|shikuchouson/i,
-    [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho/i,
-    [FieldType.COMPANY_NAME]: /company|会社名|勤務先|きんむさき|kaisha/i,
+    [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho|所在地/i,
+    [FieldType.COMPANY_NAME]: /company.*name|会社名|勤務先|きんむさき|会社(?!所在地)/i,
     [FieldType.IGNORE]: /password|passwd|pwd|captcha|hidden|secret|otp|verification/i
   };
 
