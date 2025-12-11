@@ -41,7 +41,7 @@ export class FieldDetector {
     [FieldType.PREFECTURE]: /prefecture|都道府県|とどうふけん|todofuken|勤務地/i,
     [FieldType.CITY]: /city|市区町村|しくちょうそん|shikuchouson/i,
     [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho|所在地/i,
-    [FieldType.COMPANY_NAME]: /company.*name|会社名|勤務先|きんむさき|会社(?!所在地)/i,
+    [FieldType.COMPANY_NAME]: /company.*name|会社名|勤務先|きんむさき|会社(?!所在地|住所)/i,
     [FieldType.IGNORE]: /password|passwd|pwd|captcha|hidden|secret|otp|verification/i
   };
 

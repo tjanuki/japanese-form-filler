@@ -28,7 +28,6 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         const filler = new FormFiller(settings);
         const fieldsCount = filler.fillAllForms();
 
-        showNotification(`${fieldsCount} 件のフィールドを入力しました`);
         sendResponse({ success: true, fieldsCount });
       }
     );
