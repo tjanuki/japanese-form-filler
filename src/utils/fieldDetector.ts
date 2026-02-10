@@ -22,7 +22,8 @@ export enum FieldType {
   NUMBER,
   URL,
   GENERIC_TEXT,
-  IGNORE // For password, captcha, hidden fields
+  PASSWORD,
+  IGNORE // For captcha, hidden fields
 }
 
 export class FieldDetector {
@@ -42,11 +43,13 @@ export class FieldDetector {
     [FieldType.CITY]: /city|市区町村|しくちょうそん|shikuchouson/i,
     [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho|所在地/i,
     [FieldType.COMPANY_NAME]: /company.*name|会社名|勤務先|きんむさき|会社(?!所在地|住所)/i,
-    [FieldType.IGNORE]: /password|passwd|pwd|captcha|hidden|secret|otp|verification/i
+    [FieldType.PASSWORD]: /password|passwd|pwd/i,
+    [FieldType.IGNORE]: /captcha|hidden|secret|otp|verification/i
   };
 
   // Priority order for pattern matching - higher priority patterns should match first
   private static patternOrder: FieldType[] = [
+    FieldType.PASSWORD,
     FieldType.IGNORE,
     FieldType.EMAIL,
     FieldType.PHONE,
@@ -86,6 +89,7 @@ export class FieldDetector {
         case 'date': return FieldType.DATE;
         case 'number': return FieldType.NUMBER;
         case 'url': return FieldType.URL;
+        case 'password': return FieldType.PASSWORD;
         default: return FieldType.GENERIC_TEXT;
       }
     }
