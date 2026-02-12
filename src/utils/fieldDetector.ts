@@ -97,10 +97,9 @@ export class FieldDetector {
     return FieldType.GENERIC_TEXT;
   }
 
-  private static getElementIdentifiers(element: HTMLElement): string[] {
+  static getElementIdentifiers(element: HTMLElement): string[] {
     const identifiers: string[] = [];
 
-    // Add element attributes
     if (element.id) identifiers.push(element.id);
     if (element.getAttribute('name')) identifiers.push(element.getAttribute('name')!);
     if (element.getAttribute('placeholder')) identifiers.push(element.getAttribute('placeholder')!);
@@ -114,21 +113,57 @@ export class FieldDetector {
     const ariaLabel = element.getAttribute('aria-label');
     if (ariaLabel) identifiers.push(ariaLabel);
 
+    // For DatePickers and other complex components, also search parent container for labels
+    if (element.classList.contains('p-datepicker') || element.classList.contains('p-inputwrapper')) {
+      const parentContainer = element.closest('.mb-4, .form-group, .field, [class*="flex"]');
+      if (parentContainer) {
+        const containerLabels = parentContainer.querySelectorAll('label');
+        containerLabels.forEach(lbl => {
+          const text = lbl.textContent?.trim();
+          if (text && !identifiers.includes(text)) {
+            identifiers.push(text);
+          }
+        });
+      }
+    }
+
     return identifiers;
   }
 
-  private static findLabel(element: HTMLElement): HTMLLabelElement | null {
+  static findLabel(element: HTMLElement): HTMLLabelElement | null {
     // Find label with 'for' attribute matching element id
     if (element.id) {
       const label = document.querySelector(`label[for="${element.id}"]`);
       if (label) return label as HTMLLabelElement;
     }
 
-    // Find parent label
+    // Find parent label or nearby label in parent container
     let parent = element.parentElement;
-    while (parent) {
+    let depth = 0;
+    const maxDepth = 5;
+
+    while (parent && depth < maxDepth) {
       if (parent.tagName === 'LABEL') return parent as HTMLLabelElement;
+
+      // Check for label in the same container (common in form layouts)
+      const siblingLabel = parent.querySelector('label');
+      if (siblingLabel) return siblingLabel as HTMLLabelElement;
+
+      // Also check for previous sibling labels
+      let prevSibling = parent.previousElementSibling;
+      while (prevSibling) {
+        if (prevSibling.tagName === 'LABEL') {
+          return prevSibling as HTMLLabelElement;
+        }
+        const labelInPrev = prevSibling.querySelector('label');
+        if (labelInPrev) {
+          return labelInPrev as HTMLLabelElement;
+        }
+        prevSibling = prevSibling.previousElementSibling;
+      }
+
       parent = parent.parentElement;
+      depth++;
     }
 
     return null;

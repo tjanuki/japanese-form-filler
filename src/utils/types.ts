@@ -27,3 +27,10 @@ export interface NameData {
   katakana: string;
   romaji: string;
 }
+
+export interface FormFillerSettings {
+  skipHiddenFields: boolean;
+  skipReadonlyFields: boolean;
+  defaultGender: 'random' | 'male' | 'female';
+  nameFormat: 'surname-first' | 'given-first';
+}

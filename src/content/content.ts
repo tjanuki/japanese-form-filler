@@ -2,14 +2,7 @@
 // This file runs in the context of web pages and can interact with the DOM
 
 import { FormFiller } from './formFiller';
-
-// Settings interface
-interface FormFillerSettings {
-  skipHiddenFields: boolean;
-  skipReadonlyFields: boolean;
-  defaultGender: 'random' | 'male' | 'female';
-  nameFormat: 'surname-first' | 'given-first';
-}
+import { FormFillerSettings } from '../utils/types';
 
 // Listen for messages from popup or background script
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
