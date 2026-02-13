@@ -83,13 +83,15 @@ export class FormFiller {
       }
     });
 
-    // Fill PrimeVue DatePicker components
-    const primeDatePickers = document.querySelectorAll('.p-datepicker');
-    primeDatePickers.forEach((element) => {
-      if (fillPrimeVueDatePicker(element as HTMLElement, userData)) {
-        fieldsFilledCount++;
-      }
-    });
+    // Fill PrimeVue DatePicker components (skip on job-posting pages)
+    if (this.valueMapperConfig.pageContext !== 'job-posting') {
+      const primeDatePickers = document.querySelectorAll('.p-datepicker');
+      primeDatePickers.forEach((element) => {
+        if (fillPrimeVueDatePicker(element as HTMLElement, userData)) {
+          fieldsFilledCount++;
+        }
+      });
+    }
 
     return fieldsFilledCount;
   }
