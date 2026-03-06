@@ -32,7 +32,7 @@ export class FieldDetector {
     [FieldType.PHONE]: /phone|tel|電話|でんわ|denwa/i,
     [FieldType.MOBILE_PHONE]: /mobile|携帯|けいたい|keitai/i,
     [FieldType.POSTAL_CODE]: /postal|zip|郵便|〒|ゆうびん|yuubin/i,
-    [FieldType.FULL_NAME_KANJI]: /fullname|full_name|氏名|shimei|name.*kanji|担当者名/i,
+    [FieldType.FULL_NAME_KANJI]: /fullname|full_name|氏名|名前|shimei|name.*kanji|担当者名/i,
     [FieldType.SURNAME_KANJI]: /surname|last.*name|姓|苗字|みょうじ|myouji|sei(?!.*kana)/i,
     [FieldType.GIVEN_NAME_KANJI]: /givenname|given.*name|first.*name|(?<!会社|案件|担当者)名(?!前)|なまえ|mei(?!.*kana)/i,
     [FieldType.FULL_NAME_HIRAGANA]: /name.*hiragana|ふりがな.*氏名|furigana.*name/i,
@@ -44,7 +44,7 @@ export class FieldDetector {
     [FieldType.ADDRESS]: /address|住所|じゅうしょ|jusho|所在地/i,
     [FieldType.COMPANY_NAME]: /company.*name|会社名|勤務先|きんむさき|会社(?!所在地|住所)/i,
     [FieldType.PASSWORD]: /password|passwd|pwd/i,
-    [FieldType.IGNORE]: /captcha|hidden|secret|otp|verification/i
+    [FieldType.IGNORE]: /captcha|hidden|secret|otp|verification|discount|coupon|割引|クーポン/i
   };
 
   // Priority order for pattern matching - higher priority patterns should match first
